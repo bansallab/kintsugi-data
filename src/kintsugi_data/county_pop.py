@@ -51,37 +51,11 @@ def main() -> int:
         year = int(file.name.split("-")[1][3:])
         year_info = year_bounds[year]
         lf = (
-            (
-                pl.scan_csv(
-                    file,
-                    encoding="utf8-lossy",
-                    null_values=["X"],
-                    new_columns=[
-                        "summary_lvl",
-                        "state_fips",
-                        "county_fips",
-                        "state_name",
-                        "county_name",
-                        "year",
-                        "age_grp",
-                        "tot_pop",
-                        "tot_male",
-                        "tot_female",
-                    ],
-                    schema_overrides={
-                        "summary_lvl": pl.String,
-                        "state_fips": pl.String,
-                        "county_fips": pl.String,
-                        "state_name": pl.String,
-                        "county_name": pl.String,
-                        "year": pl.Int64,
-                        "age_grp": pl.Int64,
-                        "tot_pop": pl.Int64,
-                        "tot_male": pl.Int64,
-                        "tot_female": pl.Int64,
-                    },
-                )
-                .select(
+            pl.scan_csv(
+                file,
+                encoding="utf8-lossy",
+                null_values=["X"],
+                new_columns=[
                     "summary_lvl",
                     "state_fips",
                     "county_fips",
@@ -92,12 +66,71 @@ def main() -> int:
                     "tot_pop",
                     "tot_male",
                     "tot_female",
-                )
-                .filter(
-                    pl.col("summary_lvl") == "050",
-                    pl.col("state_fips").is_between(pl.lit("01"), pl.lit("56")),
-                    pl.col("year").is_between(year_info.lb, year_info.ub),
-                )
+                    "white_male",
+                    "white_female",
+                    "black_male",
+                    "black_female",
+                    "aian_male",
+                    "aian_female",
+                    "asian_male",
+                    "asian_female",
+                    "nhpi_male",
+                    "nhpi_female",
+                ],
+                schema_overrides={
+                    "summary_lvl": pl.String,
+                    "state_fips": pl.String,
+                    "county_fips": pl.String,
+                    "state_name": pl.String,
+                    "county_name": pl.String,
+                    "year": pl.Int64,
+                    "age_grp": pl.Int64,
+                    "tot_pop": pl.Int64,
+                    "tot_male": pl.Int64,
+                    "tot_female": pl.Int64,
+                    "white_male": pl.Int64,
+                    "white_female": pl.Int64,
+                    "black_male": pl.Int64,
+                    "black_female": pl.Int64,
+                    "aian_male": pl.Int64,
+                    "aian_female": pl.Int64,
+                    "asian_male": pl.Int64,
+                    "asian_female": pl.Int64,
+                    "nhpi_male": pl.Int64,
+                    "nhpi_female": pl.Int64,
+                    "H_MALE": pl.Int64,
+                    "H_FEMALE": pl.Int64,
+                },
+            )
+            .rename({"H_MALE": "hispanic_male", "H_FEMALE": "hispanic_female"})
+            .select(
+                "summary_lvl",
+                "state_fips",
+                "county_fips",
+                "state_name",
+                "county_name",
+                "year",
+                "age_grp",
+                "tot_pop",
+                "tot_male",
+                "tot_female",
+                "white_male",
+                "white_female",
+                "black_male",
+                "black_female",
+                "aian_male",
+                "aian_female",
+                "asian_male",
+                "asian_female",
+                "nhpi_male",
+                "nhpi_female",
+                "hispanic_male",
+                "hispanic_female",
+            )
+            .filter(
+                pl.col("summary_lvl") == "050",
+                pl.col("state_fips").is_between(pl.lit("01"), pl.lit("56")),
+                pl.col("year").is_between(year_info.lb, year_info.ub),
             )
             .with_columns(
                 county_fips=pl.col("state_fips") + pl.col("county_fips"),
